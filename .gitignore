@@ -1,0 +1,23 @@
+# MATLAB
+*.asv
+*.m~
+*.mex*
+*.autosave
+slprj/
+codegen/
+*.slxc
+.matlab/
+
+# Raw simulation output (regenerate with code/experiments/)
+results/runs/
+*.mat
+
+# Office lock files
+~$*
+
+# OS / editors
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
