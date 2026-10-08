@@ -1,4 +1,4 @@
-# Strathclyde requirements
+Strathclyde requirements
 
 ## 1. Statement of Purpose, within two weeks of arrival at the host institution:
 
