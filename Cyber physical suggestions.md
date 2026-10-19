@@ -32,6 +32,11 @@ Methodology
 
 
 # Personal 2: Project overview – Self adjusting backpack
+Backpack straps loosen as you walk and the ideal tightness of the straps varies depending on load and terrain. The aim of this project is to design a small dc motor that can wind the straps around a spool to a target tension and hold without wasting power. Research on load carriage has found that heavy or poorly fitted packs concentrate pressure on the shoulders, shift the body’s centre of mass, and change walking gait, which can contribute to fatigue, back and shoulder pain, and in some cases nerve compression. A well-adjusted pack transfers more weight to the hips and keeps the load close to the body, but straps loosen with movement and as the pack’s contents settle, and the best tightness changes with the load and terrain. Most people adjust their straps once, or not at all, and put up with the discomfort.
+Workstreams
+1.	Mechanism and Structure - Design and build the physical module that winds, holds and releases the physical straps.
+2.	Electronics, sensing and control – make the module tighten to a target tension and hold.
+3.	Testing and safety – define what the project must achieve, prove it does and show it is safe.
 
 
 
