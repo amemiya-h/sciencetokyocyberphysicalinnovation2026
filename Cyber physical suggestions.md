@@ -1,4 +1,4 @@
-# Personal 1: Project overview – digitising records from observed reflections
+# Personal 1: Project overview – Digitising records from observed reflections in one shot
 
 The aim of the project is to investigate whether the information encoded in a vinyl record’s grooves can be recovered by shining light onto its surface and analysing the reflected light in a single image. By developing an image processing and reconstruction method, the project will explore whether the groove geometry can be inferred accurately enough to simulate stylus movement and reconstruct the original audio signal.
 
