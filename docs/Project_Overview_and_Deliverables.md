@@ -1,6 +1,6 @@
 # Project Overview and Deliverables
 
-## TITLE: Digitising records from observed reflections in one shot
+## TITLE: Digitising records from observed reflections using a one shot approach
 
 ## Overview
 
