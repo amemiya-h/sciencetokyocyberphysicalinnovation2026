@@ -1,5 +1,9 @@
 # Project Overview and Deliverables
 
+## TITLE: Digitising records from observed reflections in one shot
+
+## Overview
+
 Vinyl records and CDs store their sound as microscopic variations in their grooves. When a vinyl is playing, the stylus from the record player follows the groove, and the resulting motion is transmitted through to a magnetic cartridge where relative motion between a magnet and coil changes magnetic flux, inducing voltage. If an experiment were to be conducted where light is shone on the vinyl, the resulting light intensity that is reflected depends on factors such as surface orientation, illumination direction, reflectance, roughness, and camera position. Therefore, in theory, the differing intensities of reflected light could infer the original data that the vinyl holds (music). This technique could be highly useful in the recovery of damaged vinyls, digitizing analogue records, or reading music without damaging or causing wear from the stylus and turntable.
 
 ## Deliverables
