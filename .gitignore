@@ -9,7 +9,7 @@ codegen/
 .matlab/
 
 # Raw simulation output (regenerate with code/experiments/)
-results/runs/
+# results/runs/
 *.mat
 
 # Office lock files
