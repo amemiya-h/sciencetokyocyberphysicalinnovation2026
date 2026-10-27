@@ -52,4 +52,12 @@ It involves a light source focusing onto one spot on a sample, the reflected lig
 
 Another method can also be used involves the use of a spectrometer instead of a standard photo detector. Rest of the setup is the same as previously. White light shone through a pinhole onto a sample surface, reflected light shines through second pinhole at a spectrometer that can measure how much light arrives at each wavelength. When the light hits the surface, only the colour whose focal point lies exactly on the surface will pass through the second pinhole completely, as different colours with different wavelengths will come into focus at different depths. So the reflection of other colours will scatter more and not pass through the second pinhole. The spectrometer will see a sharp peak for one wavelength and as each wavelength will correspond to a known focal depth, height can be recorded and this process repeated to create the desired height map.
 
+The following equation can be used to estimate the time taken T_SCAN to scan the surface area, from the continuing process of scanning patches and stitching them together. 
+
+$$T_{\text{SCAN}} = \frac{\text{AREA}}{\text{FOV}} \ t_{\text{MEAS}} + \text{shift}$$
+
+FOV represents the field of view, so the area captured in one capture. t_MEAS represents the time taken for one measurement. Shift represents the time taken to move to the next position.
+
+
+
 [Reconstruction of mechanically recorded sound from an edison cylinder using three dimensional non-contact optical surface metrology](https://escholarship.org/content/qt6qk9j5sx/qt6qk9j5sx.pdf)
