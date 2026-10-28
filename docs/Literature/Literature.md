@@ -61,3 +61,16 @@ FOV represents the field of view, so the area captured in one capture. t_MEAS re
 
 
 [Reconstruction of mechanically recorded sound from an edison cylinder using three dimensional non-contact optical surface metrology](https://escholarship.org/content/qt6qk9j5sx/qt6qk9j5sx.pdf)
+
+
+Another method to reconstructing the groove undulations is through white light interferometry. Interferometry is a method for measuring tiny physical quantities by using light waves. It involves measuring the shape and texture of a surface using light and is built on the scientific principle of optical interference. This is for in the event that two lights meet, their wavelength peaks line up and will cause the resulting light to be brighter and if a peak meets the trough, then the resulting light is darker, this known as constructive or deconstructive interference. The pattern of light and dark bands from a reflected light depends on how much further a light beam has travelled. So, by reading the pattern, you can work out movements, vibrations or distances. This has many applications, such as the testing of optical systems, measurements of gas flows, plasmas and much more. The resulting intensity can be given as:
+
+$$I = I_1 + I_2 + 2\sqrt{I_1 I_2}\cos(\Delta\varphi)$$
+
+Where I_1 and I_2 are the separate intensities of the two beams of lights and ⁡∆φ is the phase difference between them. Phase difference can be given as:
+
+$$\Delta\varphi = \frac{2\pi}{\lambda}\\Delta p$$
+
+Where ∆p is given as the optical path difference, so how much farter one beam of light has travelled than the other, and λ gives the wavelength. So, if the wavelength of the light source is known, then the optical path difference can be derived from the interference pattern produced. To produce a valid interference pattern, some conditions need to be met on the experimental setup. First, the phase difference between the two beams must remain constant through the period of measurement. Secondly, wavelength, amplitude and frequency must be equal between the beams of light. Third, the electric field in the two beams of light must oscillate in the same direction. And fourth, the two beams should be nearly travelling in the same direction to ensure the wavefronts line up correctly. Below is a diagram displaying the basic setup for white light interferometry. 
+
+
