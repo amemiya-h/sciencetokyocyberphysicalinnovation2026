@@ -86,3 +86,262 @@
   eprint = {1810.05947},
   archivePrefix = {arXiv}
 }
+
+% =====================================================================
+% Optical reading of records (theme from 2026-10)
+% Entries marked "note = {check ...}" have a detail not yet confirmed
+% against the paper itself.
+% =====================================================================
+
+% --- Optical / image-based sound recovery: closest prior work ---------
+
+@article{fadeyev2003,
+  author  = {Fadeyev, Vitaliy and Haber, Carl},
+  title   = {Reconstruction of mechanically recorded sound by image processing},
+  journal = {Journal of the Audio Engineering Society},
+  volume  = {51},
+  number  = {12},
+  pages   = {1172--1185},
+  year    = {2003},
+  note    = {Also LBNL Report 51983. 2D imaging + edge detection of 78 rpm grooves (the basis of IRENE). check issue number}
+}
+
+@article{fadeyev2005,
+  author  = {Fadeyev, Vitaliy and Haber, Carl and Maul, Christian and McBride, John W. and Golden, Mitchell},
+  title   = {Reconstruction of recorded sound from an {Edison} cylinder using three-dimensional noncontact optical surface metrology},
+  journal = {Journal of the Audio Engineering Society},
+  volume  = {53},
+  number  = {6},
+  pages   = {485--508},
+  year    = {2005},
+  note    = {3D confocal scanning for vertically cut cylinders}
+}
+
+@inproceedings{stotzer2004,
+  author    = {Stotzer, Sylvain and Johnsen, Ottar and Bapst, Fr{\'e}d{\'e}ric and Sudan, Christophe and Ingold, Rolf},
+  title     = {Phonographic sound extraction using image and signal processing},
+  booktitle = {Proceedings of the IEEE International Conference on Acoustics, Speech, and Signal Processing (ICASSP)},
+  volume    = {4},
+  pages     = {289--292},
+  address   = {Montreal, Canada},
+  year      = {2004},
+  note      = {VisualAudio: whole disc photographed on film, film scanned, edge detection}
+}
+
+@inproceedings{cavaglieri2001,
+  author    = {Cavaglieri, Stefano and Johnsen, Ottar and Bapst, Fr{\'e}d{\'e}ric},
+  title     = {Optical retrieval and storage of analog sound recordings},
+  booktitle = {Proceedings of the AES 20th International Conference},
+  address   = {Budapest, Hungary},
+  year      = {2001},
+  note      = {First VisualAudio paper. check title and pages}
+}
+
+@inproceedings{li2007,
+  author    = {Li, Beinan and de Leon, Simon and Fujinaga, Ichiro},
+  title     = {Alternative digitization approach for stereo phonograph records using optical audio reconstruction},
+  booktitle = {Proceedings of the 8th International Conference on Music Information Retrieval (ISMIR)},
+  pages     = {165--166},
+  address   = {Vienna, Austria},
+  year      = {2007},
+  note      = {First optical reconstruction of stereo LPs; 3D white-light interferometry}
+}
+
+@inproceedings{li2009,
+  author    = {Li, Beinan and Smith, Jordan B. L. and Fujinaga, Ichiro},
+  title     = {Optical audio reconstruction for stereo phonograph records using white light interferometry},
+  booktitle = {Proceedings of the 10th International Society for Music Information Retrieval Conference (ISMIR)},
+  pages     = {627--632},
+  year      = {2009},
+  note      = {Stereo from 3D: edges -> lateral, groove bottom depth -> vertical; ~27 min scanning per second of audio}
+}
+
+@inproceedings{hensman2007,
+  author    = {Hensman, Arnold and Casey, Kevin},
+  title     = {Optical reading and playing of sound signals from vinyl records},
+  booktitle = {Proceedings of the 7th Information Technology and Telecommunications Conference (IT\&T 2007)},
+  address   = {Institute of Technology Blanchardstown, Dublin, Ireland},
+  year      = {2007},
+  note      = {USB microscope + stepper motor, stitching, edge tracking; mono 78 rpm only, no quantitative results}
+}
+
+@phdthesis{tian2006,
+  author = {Tian, Baozhong},
+  title  = {Reproduction of sound signal from gramophone records using {3D} scene reconstruction},
+  school = {Department of Computer Science, University of Western Ontario},
+  year   = {2006}
+}
+
+@article{tian2011,
+  author  = {Tian, Baozhong and Barron, John L.},
+  title   = {Using computer vision technology to play gramophone records},
+  journal = {Journal of the Audio Engineering Society},
+  volume  = {59},
+  number  = {7/8},
+  pages   = {514--538},
+  year    = {2011},
+  note    = {Groove surface orientation from images, 78 rpm era records}
+}
+
+@article{mizuno2016,
+  author  = {Mizuno, Hiroaki and Shikama, Shinsuke},
+  title   = {Reproduction of analog record sound using digital image captured by a flatbed scanner: comparison of sound groove edge-extraction filter for stereo records},
+  journal = {Bulletin of the Transdisciplinary Science Research Institute, Setsunan University},
+  volume  = {2},
+  number  = {1},
+  pages   = {75--91},
+  year    = {2016},
+  note    = {Follow-up to shikama2013 (same group): compares edge filters for stereo records; LoG/DoG best. https://setsunan.repo.nii.ac.jp/records/995}
+}
+
+@article{shikama2013,
+  author  = {Shikama, Shinsuke and Mizuno, Hiroaki},
+  title   = {Reproduction of phonograph record sound using digital image processing},
+  journal = {IEEJ Transactions on Electronics, Information and Systems},
+  volume  = {133},
+  number  = {7},
+  pages   = {1309--1315},
+  year    = {2013},
+  doi     = {10.1541/ieejeiss.133.1309},
+  note    = {Japanese title: ディジタル画像処理によるアナログレコードの音再現 (鹿間信介, 水野宏亮). Stereo LP from flatbed scanner (Epson GT-X820, 6400 dpi = 3.97 um/px, 8-bit): Sobel edges, polar-to-linear unwrapping, LEFT channel from the inner groove edge and RIGHT from the outer edge. 1 kHz test tone; 2nd harmonic -25 dB vs -40 dB on a turntable; audibly noisy}
+}
+
+@techreport{uozumi2008,
+  author      = {Uozumi, Jun},
+  title       = {Sound reproduction from monaural disc records by image processing},
+  institution = {Hokkai-Gakuen University, Faculty of Engineering},
+  type        = {Research report},
+  number      = {35},
+  pages       = {119--129},
+  year        = {2008},
+  note        = {Japanese: 魚住純「画像処理によるモノラル円盤レコードからの音声再生」北海学園大学工学部研究報告 No.35. Optical microscope + CCD camera on 78 rpm (SP) records. English title is our translation; not yet read}
+}
+
+@misc{feng2020,
+  author        = {Feng, Kevin},
+  title         = {Saving the {Sonorine}: Photovisual audio recovery using image processing and computer vision techniques},
+  year          = {2020},
+  eprint        = {2005.08944},
+  archivePrefix = {arXiv},
+  note          = {Height map from photos under several lightings (photometric stereo)}
+}
+
+@misc{springer2002,
+  author       = {Springer, Ofer},
+  title        = {Digital needle: a virtual gramophone},
+  year         = {2002},
+  howpublished = {\url{http://www.cs.huji.ac.il/~springer/}},
+  note         = {Flatbed-scanned record played back in software}
+}
+
+% --- Laser (non-imaging) readout --------------------------------------
+
+@article{iwai1986,
+  author  = {Iwai, Toshiaki and Asakura, Toshimitsu and Ifukube, Tohru and Kawashima, Takashi},
+  title   = {Reproduction of sound from old wax phonograph cylinders using the laser-beam reflection method},
+  journal = {Applied Optics},
+  volume  = {25},
+  number  = {5},
+  pages   = {597--604},
+  year    = {1986}
+}
+
+@inproceedings{nakamura1997,
+  author    = {Nakamura, Takashi and Ushizaka, Tsuyoshi and Uozumi, Jun and Asakura, Toshimitsu},
+  title     = {Optical reproduction of sounds from old phonographic wax cylinders},
+  booktitle = {Proceedings of SPIE},
+  volume    = {3190},
+  pages     = {304--313},
+  year      = {1997},
+  note      = {check exact title and author names}
+}
+
+@misc{stoddard1989,
+  author       = {Stoddard, Robert E.},
+  title        = {Optical turntable system with reflected spot position detection},
+  howpublished = {US Patent 4,870,631},
+  year         = {1989},
+  note         = {Basis of the ELP laser turntable}
+}
+
+% --- Record standard -------------------------------------------------
+
+@misc{iec60098,
+  author       = {{International Electrotechnical Commission}},
+  title        = {{IEC} 60098:2020 Analogue audio disk records and reproducing equipment},
+  edition      = {4.0},
+  year         = {2020},
+  note         = {Groove dimensions, 45/45 stereo convention, RIAA recording characteristic}
+}
+
+% --- Physics of the forward model ------------------------------------
+
+@article{cooktorrance1982,
+  author  = {Cook, Robert L. and Torrance, Kenneth E.},
+  title   = {A reflectance model for computer graphics},
+  journal = {ACM Transactions on Graphics},
+  volume  = {1},
+  number  = {1},
+  pages   = {7--24},
+  year    = {1982},
+  note    = {Microfacet reflection model used in reflectance_lut.m}
+}
+
+@book{beckmann1963,
+  author    = {Beckmann, Petr and Spizzichino, Andr{\'e}},
+  title     = {The Scattering of Electromagnetic Waves from Rough Surfaces},
+  publisher = {Pergamon Press},
+  year      = {1963},
+  note      = {Beckmann slope distribution for surface roughness}
+}
+
+@article{zhang2007psf,
+  author  = {Zhang, Bo and Zerubia, Josiane and Olivo-Marin, Jean-Christophe},
+  title   = {Gaussian approximations of fluorescence microscope point-spread function models},
+  journal = {Applied Optics},
+  volume  = {46},
+  number  = {10},
+  pages   = {1819--1829},
+  year    = {2007},
+  note    = {Gaussian approximation of the Airy PSF (sigma ~ 0.21 lambda/NA)}
+}
+
+@article{thompson2002,
+  author  = {Thompson, Russell E. and Larson, Daniel R. and Webb, Watt W.},
+  title   = {Precise nanometer localization analysis for individual fluorescent probes},
+  journal = {Biophysical Journal},
+  volume  = {82},
+  number  = {5},
+  pages   = {2775--2783},
+  year    = {2002},
+  note    = {Sub-pixel localisation precision vs blur, photons and noise}
+}
+
+% --- Inverse problems -------------------------------------------------
+
+@book{hansen2010,
+  author    = {Hansen, Per Christian},
+  title     = {Discrete Inverse Problems: Insight and Algorithms},
+  publisher = {SIAM},
+  year      = {2010}
+}
+
+@book{kaipio2005,
+  author    = {Kaipio, Jari and Somersalo, Erkki},
+  title     = {Statistical and Computational Inverse Problems},
+  publisher = {Springer},
+  year      = {2005}
+}
+
+% --- Hardware ---------------------------------------------------------
+
+@article{collins2020,
+  author  = {Collins, Joel T. and Knapper, Joe and Stirling, Julian and others},
+  title   = {Robotic microscopy for everyone: the {OpenFlexure} microscope},
+  journal = {Biomedical Optics Express},
+  volume  = {11},
+  number  = {5},
+  pages   = {2447--2460},
+  year    = {2020},
+  note    = {Open-source microscope with a reflection (epi) illumination module}
+}

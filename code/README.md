@@ -1,87 +1,177 @@
-# Code
+# vinylscan
 
-Recovering audio from camera images of a vinyl record's groove.
+Version 1.0, locked 2026-11-15. Method: `docs/METHOD_groove_image_to_music.md`.
 
-- **Forward path** (`forward_*.m`): music → groove shape → simulated camera frames, saved to `data/<dataset>/`.
-- **Retrieval path** (`retrieve_centreline.m`): frames → groove edges → centreline → audio.
+Recovers stereo audio and groove position from microscope video of a record
+turning slowly on a stepper-driven turntable.
 
-Run `startup` in the repository root first; it adds `code/` and `code/lib/` to the path. All lengths are in micrometres (µm) unless stated. In a frame, rows run along the groove and columns run across it.
+Written for MATLAB (R2020b or newer, no toolboxes). Also runs in GNU Octave,
+except for reading video files.
 
-## Scripts (`code/`)
+## The idea
 
-| File | What it does |
+The microscope stays at one radius while the disc turns. From every frame
+only a narrow slice across the grooves is used, so the camera behaves like a
+line scanner and the spiral comes out already unwound: disc angle along one
+axis, radius along the other. No image stitching, no motion tracking.
+
+In that unwound view each groove is a dark band between two edges.
+
+- The edge nearer the spindle is the left channel, the edge nearer the rim
+  is the right channel.
+- The slow drift of the band is the groove position: the spiral, the
+  mastering pitch changes and any off-centre wobble.
+
+One revolution captures every groove in the field of view. Bands are laid
+end to end to give a continuous groove, the microscope is stepped inward,
+and overlapping rings are spliced by matching the groove wiggle.
+
+## Quick start
+
+    addpath examples
+    demo_synthetic          % simulated disc, no hardware needed
+
+    run tests/test_synthetic   % end-to-end check against known truth
+
+For real scans copy `examples/process_real_side.m` and edit the marked lines.
+
+## Two ways in
+
+| Scan | Entry point | Needs |
+|---|---|---|
+| Stepper turntable, known frames per revolution | `groove.processRing` / `groove.processSide` | accurate `framesPerRev` |
+| Turned by hand, or motor not synchronised with the camera | `groove.processFreehand` | consecutive frames overlapping by half a frame or more |
+
+`processFreehand` places the frames itself, by matching the groove wiggles
+they share, averages every view of each groove, and finds the revolution
+from the music repeating one groove over. It also reports signal against
+noise by frequency band, measured from odd frames against even frames.
+See `examples/process_freehand_video.m`.
+
+Speed: reading the groove edges is the slow step. It runs on all parallel
+workers (`cfg.run.parallel`), and `cfg.run.edgeCache` keeps the result in a
+`.mat` file so a rerun starts at registration. `report.timing` lists the
+seconds per stage; `examples/profile_freehand_video.m` runs the MATLAB
+profiler on a short stretch.
+
+Slow groove position from a
+hand-turned scan is only approximate; the audio does not depend on it.
+
+## Motorised rig
+
+`+rig` drives the stepper turntable in `hardware/turntable` (Arduino Uno,
+CNC shield, firmware `tt_firmware`) over its serial protocol.
+
+| Script | Rig |
 |---|---|
-| `forward_sine.m` | Forward path for a 1 kHz test tone, like a test record; writes `data/sine/`. Takes about a minute; good for checking the retrieval. |
-| `forward_music.m` | Forward path for a clip of the Brahms recording (stereo, RIAA); writes `data/music/`. |
-| `forward_microscope_view.m` | Renders wide 5× microscope views with many neighbouring turns, as a phone photo through the eyepiece and as an eyepiece camera; writes `data/view_*` and `results/figures/view_*.png`. |
-| `retrieve_centreline.m` | Retrieval path for one dataset (set `dataset` at the top): tracks the groove, plays it back, prints coverage / centreline RMSE / SNR, writes WAVs to `results/runs/`, and plots. |
-| `run_full_track.m` | End to end on the whole recording: forward path (about 12,500 frames, about 4–5 GB) then retrieval. Can be stopped and restarted. |
-| `compare_setups.m` | Runs forward + retrieval for every camera preset × lighting type on a short clip and tabulates image brightness, noise and audio quality. |
-| `project_root.m` | Returns the repository root path. |
-| `save_figure.m` | Saves a figure as PNG and PDF under `results/figures/`. |
+| `examples/scan_ring_motorized.m` | turntable only: one ring |
+| `examples/scan_side_motorized.m` | turntable and radial axis: step and repeat over several rings |
 
-## Library (`code/lib/`)
+Both turn the disc at a steady speed while the microscope records, and
+then read the video with `processFreehand`, so the camera needs no link
+to the motor. Recording is started and stopped by hand. Set `port = ""`
+for a dry run against `rig.simulated()`, which prints every command.
 
-**Record, groove and cutting**
+## What to film
 
-| File | What it does |
-|---|---|
-| `default_scene.m` | Record, groove, vinyl and dust parameters: radius, rpm, depth, wall angle, groove spacing, roughness, etc. Values marked "assumed" should be replaced with measurements. |
-| `load_clip.m` | Reads a time range of an audio file. |
-| `audio_to_groove.m` | Cuts audio into groove motion as a lathe does: RIAA pre-emphasis, velocity → displacement, 45/45 stereo (L+R sideways, L−R vertical). |
-| `riaa_response.m` | The RIAA playback curve (its inverse is the cutting curve). |
-| `groove_motion_at.m` | Evaluates groove motion at any time from the audio-rate signal (local spline). |
-| `groove_surface.m` | Height map of one or more V-grooves, with rounded bottom and edges; also marks the wall regions. |
+For each radial position, one video of a little more than one revolution
+(about 1.05 turns).
 
-**Light, optics and camera**
+- **Orientation.** Grooves must run horizontally in the image.
+- **Speed.** The disc may move at most one frame width between frames.
+  Much less is better: aim for 0.1 to 0.3 mm of travel per frame.
+- **Exposure.** Short enough that the surface moves under about 2 um
+  during it.
+- **Timing.** `cfg.turntable.framesPerRev` must be accurate, since it is
+  the only link between frames and disc angle. Triggering the camera from
+  the stepper pulses makes it exact.
+- **Overlap.** Step the microscope by less than the field of view, so
+  neighbouring rings share at least two or three groove turns.
+- **Radius.** Give the radius at the image centre for each ring. Relative
+  accuracy between rings should be within about one groove pitch (0.1 mm);
+  if it is not, set `cfg.join.searchTurns = Inf`.
+- **Format.** Lossless or lightly compressed video, or numbered images.
 
-| File | What it does |
-|---|---|
-| `light_sources.m` | Light directions for `coaxial` (through the lens), `side` or `ring` lighting. |
-| `cone_samples.m` | Evenly spread directions inside a cone; used for light sources and the lens aperture. |
-| `fresnel_reflectance.m` | Reflectance of the vinyl (PVC) surface vs angle. |
-| `reflectance_lut.m` | Lookup table: light reaching the lens vs surface orientation, combining a rough-surface (microfacet) reflection model with Fresnel, diffuse reflection and the V-groove's corner-reflector double bounce. |
-| `surface_normals.m` | Surface normals from a height map. |
-| `cast_shadow.m` | Shadows from low side lights. |
-| `dust_mask.m` | Random dust particles (repeatable per frame). |
-| `scene_radiance.m` | Light sent into the lens by every point of the surface. |
-| `camera_optics.m` | Lens blur (diffraction + depth-dependent defocus), pixel averaging, lens aberration blur. |
-| `camera_sensor.m` | Shot noise, read noise, pixel gain variation, bit depth, optional averaging of several exposures. |
-| `camera_preset.m` | Candidate setups: `microscope10x`, `microscope5x`, `phoneEyepiece5x`, `telecentric2x`, `usbMicroscope`, `phoneMacro`. Values are typical guesses, not datasheets. |
-| `simulate_scan.m` | **Forward model entry point.** Ties the above together and writes the frames, `meta.mat` and `truth.mat` (see below). Runs frames in parallel with `parfor` and resumes interrupted runs. |
-| `eyepiece_look.m` | Turns a frame into a lamp-tinted, circular-field picture like a photo through the eyepiece (display only). |
+Before a full run, look at `groove.scan.buildKymograph`: every groove
+should be a clean dark band with sharp edges.
 
-**Retrieval**
+## Layout
 
-| File | What it does |
-|---|---|
-| `retrieve_audio.m` | **Retrieval entry point.** Tracks all frames, fills gaps, plays back, then scores against `truth.mat`. |
-| `track_groove_dataset.m` | Runs the edge tracker frame by frame, carrying the groove position across frames. |
-| `track_groove_edges.m` | Per row: finds edge candidates to sub-pixel accuracy and picks the best left/right pair by edge strength, width and closeness to the previous row. `feature = 'step'` for head-on light, `'ridge'` for thin bright edges under side light. |
-| `read_groove_frame.m` | Loads one frame scaled to [0, 1] and its row indices. |
-| `fill_gaps.m` | Interpolates rows where no edge pair was found. |
-| `centreline_to_audio.m` | Plays the centreline back like a turntable: velocity, RIAA de-emphasis, 20 Hz–20 kHz band-pass, resample to 48 kHz. |
+    +groove/
+      defaultConfig.m        every tunable parameter, documented
+      processRing.m          one video        -> unwound groove edges
+      processSide.m          several videos   -> one continuous groove
+      processFreehand.m      hand-turned video -> unwound groove edges
+      +io/                   video and image-folder readers, CSV writer
+      +scan/                 frames -> groove edges at every sample
+      +track/                follow grooves, unwind, join rings, position
+      +mosaic/               scans without known angles: register, average, unwind
+      +audio/                edges -> stereo audio (RIAA), filters, click removal
+      +sim/                  synthetic disc renderer for testing
+      +util/                 gap filling, correlation search
+    +rig/                    serial driver for the motorised turntable and radial axis
+    +groove/+viz/            one worked example of every step, for figures
+    examples/                demo, templates for real data, motorised scan scripts,
+                             visualize_steps.m and visualize_forward_model.m (figures for slides)
+    tests/                   end-to-end test on the simulator
 
-**Plots and evaluation**
+The pipeline, in call order:
 
-| File | What it does |
-|---|---|
-| `plot_edges.m` | Detected vs true edges over a frame. |
-| `plot_edge_profiles.m` | Brightness across the groove at chosen rows, with edges marked. |
-| `plot_error_along_groove.m` | Centreline error vs position. |
-| `plot_error_histogram.m` | Distribution of the centreline error. |
-| `plot_audio.m` | True vs recovered audio: waveform and spectrum. |
-| `plot_groove.m` | 3-D and top view of a groove surface patch. |
-| `image_stats.m` | Brightness of land, rims and walls, and noise in a frame (used by `compare_setups.m`). |
-| `error_metrics.m` | RMSE, MAE, bias etc. of an error vector (currently unused). |
-| `plot_intensity_maps.m` | Side-by-side brightness images (currently unused). |
+| Step | Function | Result |
+|---|---|---|
+| 1 | `groove.scan.extractEdges` | both edges of every groove at every sample |
+| 2 | `groove.track.linkTracks` | each groove band followed along the scan |
+| 3 | `groove.track.unwindRing` | bands laid end to end in playback order |
+| 4 | `groove.track.joinRings` | rings spliced into one groove |
+| 5 | `groove.audio.edgesToAudio` | stereo audio |
+| 6 | `groove.track.groovePosition` | groove radius and width against angle |
 
-## Data handed from forward to retrieval
+Each function's help text (`help groove.track.unwindRing`) explains its
+reasoning.
 
-Each dataset in `data/<name>/` contains:
+## Outputs
 
-- `frame_00001.png`, … — camera frames, 16-bit greyscale, each `frameRows` rows along the groove.
-- `meta.mat` — what a real instrument would know: pixel grid `x`, `y`, pixel size `dy`, `scene`, `cam`, `light`, `frameRows`, `nFrames`, `grooveSpeed`, `exposure`.
-- `truth.mat` — the true sideways (`xc`) and vertical (`vert`) groove motion per row. Used only for scoring, never for the reconstruction.
+- **Audio**: left and right, RIAA de-emphasised, normalised.
+- **Groove position**: radius of the groove centre about the turntable
+  axis and groove width, both against unwound angle and playback time.
+  `groove.track.removeEccentricity` fits and removes the off-centre wobble.
 
-These folders can be regenerated with the `forward_*.m` scripts and are excluded by `.gitignore` (`data/*/`).
+## Tested, and not
+
+- **Simulator** (`tests/test_synthetic.m`, stepper path): edge positions to
+  about 0.01 um, crosstalk below -50 dB, ring joins within half a sample.
+- **Real video** (freehand path): one hand-turned Keyence recording, 1014
+  frames at 4.96 um/pixel. 57 consecutive turns, 102.6 s of audio.
+  Everything from `groove.mosaic.fromEdges` onward ran on it.
+  `groove.mosaic.frameEdges` was checked on two full frames of it.
+- In MATLAB R2024b `processFreehand` runs end to end from the video file,
+  with parallel edge reading (about 4 minutes on 8 workers). Two MATLAB
+  runs recovered only 34 of the 57 turns because of a groove-numbering
+  bug (two grooves given the same number where the groove spacing
+  widens). The fix was verified by running the edges MATLAB had cached
+  through the library under Octave (57 turns); the MATLAB run with the
+  fix is not yet known.
+- **Motorised rig:** nothing has touched hardware. The firmware compiles
+  and behaves correctly against a simulated Arduino on a PC (not built
+  with the Arduino toolchain); the driver was run against
+  `rig.simulated()`; the scan scripts were dry-run up to the point where
+  they read a video. Joining freehand rings was checked by cutting the
+  real 57-turn ring into two overlapping pieces at different sample rates
+  and joining them again (same length, 0.16 um rms difference).
+- Everything else here ran under GNU Octave. `imageFolderFrameSource` has
+  not been run at all.
+- The freehand path has no simulator test yet.
+
+## Known limits
+
+- **Channel assignment is first order.** One edge per channel ignores the
+  finite cutter geometry. If channels come out swapped, swap the columns;
+  for absolute polarity set `cfg.audio.invert`.
+- **Half-sample step at ring joins.** Each ring has its own sampling
+  phase. Starting every ring at the same stepper position removes it.
+- **Click removal is crude.** Edge jumps faster than
+  `cfg.audio.maxVelocityCmS` are bridged; smaller clicks remain.
+- **Memory.** A whole side at 96 kHz holds about 2 GB of edge data. Use
+  48 kHz if that is too much.
+- **Touching grooves.** Where loud passages leave no land between grooves
+  the detector loses both and interpolates.

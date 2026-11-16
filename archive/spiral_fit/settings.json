@@ -1,0 +1,75 @@
+{
+  "record": {
+    "rpm": 33.3333,
+    "pitch_um": 120,
+    "pitchMin_um": 40,
+    "pitchMax_um": 300,
+    "pitchKnotTurns": 5,
+    "pitchChangeMax_umPerTurn": 2,
+    "grooveWidth_um": 64,
+    "grooveWidthTol": 0.35,
+    "grooveIncludedAngle_deg": 90,
+    "outerEdgeAtTop": true,
+    "playsInward": true
+  },
+  "microscope": {
+    "magnification": 50,
+    "pixelAt1x_um": 148.8,
+    "mirrored": false,
+    "distortionPowersX": [2, 3, 4, 5, 6],
+    "distortionPowersY": [0, 1, 2, 3]
+  },
+  "overlap": {
+    "minMatch": 0.08,
+    "sigma_px": 2
+  },
+  "motion": {
+    "linkSigmaAlong_px": 0.5,
+    "linkSigmaAcross_groove": 0.03
+  },
+  "video": {
+    "downsample": 2,
+    "views": 4,
+    "focusWeight": 1,
+    "alignMax_px": 8
+  },
+  "spiralFit": {
+    "stages": ["poses", "pitch", "distortion"],
+    "huberK": 2,
+    "iterationsPerStage": 10,
+    "initPhaseErrorMax_turns": 0.3,
+    "lockMarginMin_turns": 0.1,
+    "gaugeTheta_rad": 0.001,
+    "distortionMax_px": 10,
+    "subsample": 8,
+    "fitFrameStep": 3
+  },
+  "grooveReading": {
+    "window_pitch": 0.5,
+    "iterations": 6,
+    "huberK": 2,
+    "bottomLine": true,
+    "rejectResidualFactor": 3
+  },
+  "physicalLimits": {
+    "vMax_m_s": 0.3,
+    "rhoMin_um": 10,
+    "noiseSigma": 3
+  },
+  "music": {
+    "binRate_Hz": 32000,
+    "bandLow_Hz": 20,
+    "bandHigh_Hz": 15000,
+    "riaa": true,
+    "leftWall": "inner",
+    "gapFillMax_ms": 2,
+    "binAverage": "robust"
+  },
+  "output": {
+    "fsOut_Hz": 48000,
+    "eqHighpass_Hz": 50,
+    "levelPercentile": 99.5,
+    "softLimit": true,
+    "matFormat": "-v7"
+  }
+}

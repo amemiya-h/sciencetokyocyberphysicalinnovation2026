@@ -16,6 +16,11 @@
     R <deg/s>                 max speed for moves      (default 20 deg/s)
     C <deg/s^2>               acceleration             (default 40 deg/s^2)
     E <0|1>                   driver disable / enable
+  Radial axis (optional, motor on the Y slot). Only moves while the turntable is stopped:
+    Y <mm>                    relative radial move (+ = toward the spindle)
+    W <mm/s>                  radial speed             (default 1 mm/s)
+    K                         set current radial position as zero
+    Q                         print radial position
   Every line it sends starts with a tag, comma separated, times in ms (millis):
     OK,<cmd>                  command accepted
     MV,<t>,<pos_steps>        a move started
@@ -23,6 +28,7 @@
     DN,<t>,<pos_steps>        motion finished
     POS,<t>,<pos_steps>,<deg>
     HOME,<t>,<ok|fail>
+    RD,<t>,<rad_steps>,<mm>   a radial move finished (also the reply to Q)
     ERR,<text>
   Log these lines on the PC alongside the video: DW lines give theta for every dwell.
 */
@@ -36,6 +42,9 @@ const uint8_t PIN_EN   = 8;    // all drivers, active LOW
 const uint8_t PIN_HOME = 9;    // X- limit header
 const bool    HOME_ACTIVE_HIGH = true;   // most slotted optical endstops: HIGH when blocked
 const bool    DIR_INVERT = false;        // flip if + angles turn clockwise seen from above
+const uint8_t PIN_YSTEP = 3;   // Y STEP  (radial axis)
+const uint8_t PIN_YDIR  = 6;   // Y DIR
+const bool    RAD_DIR_INVERT = false;    // flip if + mm moves away from the spindle
 
 // ---------------- mechanics ----------------
 const long  MOTOR_STEPS = 200;
@@ -43,6 +52,10 @@ const long  MICROSTEPS  = 32;
 const long  RATIO       = 4;              // GT2 80T / 20T
 const long  STEPS_PER_REV = MOTOR_STEPS * MICROSTEPS * RATIO;   // 25600
 const float STEPS_PER_DEG = STEPS_PER_REV / 360.0f;             // 71.11
+// Radial axis: SET THIS for your screw or belt. 200 full steps x 32 microsteps
+// per motor turn, divided by the travel per motor turn in mm.
+// Example: a lead screw with 8 mm lead gives 6400 / 8 = 800.
+const float RAD_STEPS_PER_MM = 800.0f;
 
 // ---------------- motion state (shared with ISR) ----------------
 volatile long  pos = 0;            // steps, + = counter-clockwise
@@ -63,6 +76,10 @@ bool  idxActive = false;
 long  idxStep = 0, idxCount = 0, idxDone = 0;
 unsigned long idxSettle = 300, idxDwell = 500, idxT0 = 0;
 enum IdxPhase { IDX_MOVE, IDX_SETTLE, IDX_DWELL } idxPhase = IDX_MOVE;
+
+// radial axis (moved by a simple blocking loop; the turntable is at rest then)
+long  radPos = 0;                       // steps, + = toward the spindle
+float radSpeed = 1.0f;                  // mm/s
 
 // homing
 bool homing = false;
@@ -155,6 +172,39 @@ void updateRamp(float dt) {
   timerSetRate(v);
 }
 
+// ---------------- radial axis ----------------
+void reportRadial() {
+  Serial.print(F("RD,")); Serial.print(millis()); Serial.print(',');
+  Serial.print(radPos); Serial.print(','); Serial.println(radPos / RAD_STEPS_PER_MM, 4);
+}
+
+// Relative move with a short ramp at both ends. Blocks until done; an X on
+// the serial line aborts it.
+void radialMove(float mm) {
+  long steps = lroundf(mm * RAD_STEPS_PER_MM);
+  long n = labs(steps);
+  int8_t s = steps >= 0 ? 1 : -1;
+  digitalWrite(PIN_YDIR, ((s > 0) ^ RAD_DIR_INVERT) ? HIGH : LOW);
+  delayMicroseconds(5);
+  float rate = radSpeed * RAD_STEPS_PER_MM;            // steps/s at full speed
+  if (rate < 10.0f) rate = 10.0f;
+  if (rate > 8000.0f) rate = 8000.0f;
+  const long RAMP = 200;                               // steps of ramp at each end
+  for (long i = 0; i < n; i++) {
+    if (Serial.peek() == 'X' || Serial.peek() == 'x') break;
+    long edge = min(i, n - 1 - i);                     // distance to the nearer end
+    float r = edge < RAMP ? rate * (0.25f + 0.75f * edge / RAMP) : rate;
+    unsigned long interval = (unsigned long)(1000000.0f / r);
+    digitalWrite(PIN_YSTEP, HIGH);
+    delayMicroseconds(3);                              // DRV8825 needs >= 1.9 us high
+    digitalWrite(PIN_YSTEP, LOW);
+    radPos += s;
+    if (interval > 16000UL) { delay(interval / 1000UL); delayMicroseconds(interval % 1000UL); }
+    else delayMicroseconds(interval);
+  }
+  reportRadial();
+}
+
 // ---------------- reporting ----------------
 long readPos() { long p; noInterrupts(); p = pos; interrupts(); return p; }
 
@@ -193,6 +243,12 @@ void handle(char *line) {
     case 'R': if (a > 0) vmax = a * STEPS_PER_DEG; break;
     case 'C': if (a > 0) accel = a * STEPS_PER_DEG; break;
     case 'E': digitalWrite(PIN_EN, a > 0 ? LOW : HIGH); break;
+    case 'Y':
+      if (running) { Serial.println(F("ERR,stop the turntable before a radial move")); return; }
+      radialMove(a); break;
+    case 'W': if (a > 0) radSpeed = a; break;
+    case 'K': radPos = 0; break;
+    case 'Q': reportRadial(); return;
     default: Serial.println(F("ERR,unknown command")); return;
   }
   Serial.print(F("OK,")); Serial.println(c);
@@ -219,6 +275,7 @@ bool homeSensor() {
 // ---------------- setup / loop ----------------
 void setup() {
   pinMode(PIN_STEP, OUTPUT); pinMode(PIN_DIR, OUTPUT);
+  pinMode(PIN_YSTEP, OUTPUT); pinMode(PIN_YDIR, OUTPUT);
   pinMode(PIN_EN, OUTPUT); digitalWrite(PIN_EN, LOW);   // enable drivers
   pinMode(PIN_HOME, INPUT_PULLUP);
   TCCR1A = 0; TCCR1B = 0; TIMSK1 = 0;

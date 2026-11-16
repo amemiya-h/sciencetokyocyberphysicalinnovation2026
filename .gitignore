@@ -8,8 +8,8 @@ codegen/
 *.slxc
 .matlab/
 
-# Raw simulation output (regenerate with code/experiments/)
-# results/runs/
+# Run outputs: edge caches, results and audio (regenerate with code/examples/)
+results/runs/
 *.mat
 
 # Office lock files
@@ -22,5 +22,5 @@ desktop.ini
 .vscode/
 .idea/
 
-# Generated groove datasets (regenerate with code/forward_*.m)
+# Videos and generated datasets (large; kept outside git)
 data/*/

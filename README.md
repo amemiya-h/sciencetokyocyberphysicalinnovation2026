@@ -1,31 +1,44 @@
-# Smart Irrigation: Soil Moisture Estimation from Sparse Sensors
+# Reading a record from microscope images
 
-Science Tokyo, Cyber-Physical Innovation 2026. Interim presentation ~11/9, final ~12/18.
+Science Tokyo, Cyber-Physical Innovation 2026. Final presentation about 12/18.
 
-We estimate the hidden soil moisture distribution from a few moisture sensors and an inverse model, and study whether designed irrigation pulses make the soil easier to identify, and at what water cost.
+A record is filmed under a microscope while it turns, and the music is
+recovered from the pictures alone: an inverse problem from groove images
+to sound. See `docs/PRESENTATION_groove_image_to_music.md` for the story
+and `docs/METHOD_groove_image_to_music.md` for the method.
 
 ## Layout
 
 ```
-docs/
-  science.md       Problem, method, novelty, findings     → scientific report
-  project.md       Team, workflow, decisions, timeline    → project report
-  meetings.md      Meeting notes, newest at the bottom    → project report
-  experiments.md   One entry per experiment (E001, ...)   → results in both
-  references.bib
-  archive/         Original proposal and candidate idea lists
-code/              MATLAB functions
-  experiments/     One script per experiment: E001_forward_sanity.m, ...
-results/figures/   Figures, named E###_name.png
-startup.m          Adds code/ to the MATLAB path
+code/                 the method (MATLAB, no toolboxes; see code/README.md)
+  +groove/            image -> groove edges -> music
+  +rig/               serial driver for the motorised turntable
+  examples/           scripts to run: process a video, scan with the rig, draw figures
+  tests/              end-to-end test on a simulated disc
+data/
+  keyence_recording/  the microscope videos (not in git)
+docs/                 method, presentation walkthrough, project notes, literature
+  archive/            documents of earlier approaches
+hardware/turntable/   the stepper turntable: CAD, drawings, firmware, build guide
+results/
+  figures/            figures for the slides
+  runs/<video name>/  what a run writes: edges.mat (cache), result.mat, audio.wav (not in git)
+archive/              earlier implementations and the original proposal, kept for reference
 ```
 
-Each experiment's ID (E001, ...) is shared by its script, its entry in `experiments.md`, and its figures, so every result traces back to the code that produced it.
+## Running
+
+From this folder, in MATLAB:
+
+    addpath code/examples
+    process_freehand_video          % the 30x recording -> results/runs/20261029_163032/
+    process_freehand_video_50x      % the 50x recording -> results/runs/20261027_184833/
+    visualize_steps                 % figures of every step -> results/figures/
+    visualize_forward_model         % the forward process in one figure
 
 ## Conventions
 
-- Run `startup` first (automatic if MATLAB starts in this folder).
-- Model logic lives in functions in `code/`; experiment scripts only set up, call functions and plot.
-- Units: cm and h (proposed). Put units in each function's header comment.
-- Experiment scripts call `rng(seed)` at the top and save figures with `save_figure(fig, 'E003', 'name')`.
+- Lengths in micrometres unless the name says otherwise; settings live in
+  `groove.defaultConfig`, each with a comment.
+- A run's outputs go in `results/runs/<video name>/`; figures in `results/figures/`.
 - Work on a branch and merge to `main` through a pull request.

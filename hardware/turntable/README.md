@@ -8,3 +8,6 @@ To buy: Amazon (controller kit, motor) and MISUMI (2 × 608ZZ, shaft, 2GT belt, 
 - cad/       tt_parts.scad (all printed parts, parametric) + stl/ (P1S, PETG; feet TPU; already in print orientation, no supports)
 - firmware/  tt_firmware/tt_firmware.ino (Arduino Uno + CNC shield, serial command set)
 - matlab/    tt_run_index.m (runs an index scan, logs one CSV row per dwell)
+
+The firmware also drives an optional radial axis on the shield's Y slot (commands Y, W, K, Q; set RAD_STEPS_PER_MM in the sketch).
+The MATLAB driver for scans is code/+rig, used by code/examples/scan_ring_motorized.m and scan_side_motorized.m.
