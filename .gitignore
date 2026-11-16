@@ -9,7 +9,6 @@ codegen/
 .matlab/
 
 # Run outputs: edge caches, results and audio (regenerate with code/examples/)
-results/runs/
 *.mat
 
 # Office lock files
